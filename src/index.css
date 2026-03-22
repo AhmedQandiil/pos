@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Space+Mono:wght@400;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-cairo: "Cairo", sans-serif;
+  --font-space-mono: "Space Mono", monospace;
+}
+
+@layer base {
+  body {
+    @apply font-cairo;
+  }
+}
+
+/* ✅ RESPONSIVE FIX: Touch scroll */
+.scroll-touch { -webkit-overflow-scrolling: touch; overflow-y: auto; }
+
+/* ✅ RESPONSIVE FIX: Hide scrollbar */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ✅ RESPONSIVE FIX: Press feedback */
+.touch-feedback { transition: transform 0.1s; }
+.touch-feedback:active { transform: scale(0.95); }
+
+/* ✅ RESPONSIVE FIX: Safe area bottom (notched phones) */
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+/* React Datepicker Dark Mode Styles */
+.react-datepicker {
+  background-color: #1a1d26 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 1rem !important;
+  font-family: inherit !important;
+  color: white !important;
+}
+
+.react-datepicker__header {
+  background-color: #0f1117 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-top-left-radius: 1rem !important;
+  border-top-right-radius: 1rem !important;
+}
+
+.react-datepicker__current-month,
+.react-datepicker__day-name,
+.react-datepicker__day {
+  color: white !important;
+}
+
+.react-datepicker__day:hover {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+  border-radius: 0.5rem !important;
+}
+
+.react-datepicker__day--selected {
+  background-color: #f59e0b !important;
+  color: black !important;
+  border-radius: 0.5rem !important;
+}
+
+.react-datepicker__day--keyboard-selected {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+  border-radius: 0.5rem !important;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: #f59e0b !important;
+}
+
+.react-datepicker__triangle {
+  display: none !important;
+}
+
+/* ✅ RESPONSIVE FIX: Print: show receipt only */
+@media print {
+  body > * { display: none !important; }
+  #receipt-content { display: block !important; }
+}
