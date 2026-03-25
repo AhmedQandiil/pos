@@ -1,6 +1,6 @@
 'use client'; // ✅ NEW
 
-import React, { useState, useEffect } from 'react'; // ✅ NEW
+import React, { useState, useEffect, useRef } from 'react'; // ✅ NEW
 import { motion, AnimatePresence } from 'motion/react'; // ✅ NEW
 import { X, ChevronLeft, ChevronRight, Printer, Check, Wallet, CreditCard, Banknote, ClipboardList } from 'lucide-react'; // ✅ NEW
 import { useCartStore } from '../../store/cartStore'; // ✅ NEW
@@ -21,6 +21,19 @@ const PaymentModal: React.FC = () => { // ✅ NEW
 
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // ✅ BUG FIX: Generate and lock order number for preview and saving
+  const orderNumberRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (currentStep === 3 && !orderNumberRef.current) {
+      const nextNum = useOrdersStore.getState().lastOrderNumber + 1;
+      orderNumberRef.current = String(nextNum).padStart(4, '0');
+    }
+    if (!isOpen) {
+      orderNumberRef.current = null;
+    }
+  }, [currentStep, isOpen]);
 
   // Reset state when modal opens/closes
   useEffect(() => {
@@ -68,6 +81,7 @@ const PaymentModal: React.FC = () => { // ✅ NEW
 
     const orderData = {
       id: orderId,
+      orderNumber: orderNumberRef.current || '', // ✅ BUG FIX
       items: items.map(item => ({
         productId: item.product.id,
         productName: item.product.name,
@@ -93,19 +107,18 @@ const PaymentModal: React.FC = () => { // ✅ NEW
     };
 
     // 1. Add to orders store
-    addOrder(orderData);
+    const savedOrder = addOrder(orderData); // ✅ BUG FIX
 
     // 2. Add to kitchen store
     addTicket({
       id: crypto.randomUUID(),
       orderId: orderId,
-      orderNumber: (useOrdersStore.getState().lastOrderNumber).toString(), // This will be updated by addOrder
+      orderNumber: savedOrder.orderNumber, // ✅ BUG FIX
       tableNumber: tableNumber ? tableNumber.toString() : undefined,
       items: items.map(i => ({
         name: i.product.name,
         quantity: i.quantity,
-        notes: i.notes
-      })),
+      })), // ✅ BUG FIX
       notes: notes,
       status: 'preparing',
       createdAt: new Date(),
@@ -348,7 +361,7 @@ const PaymentModal: React.FC = () => { // ✅ NEW
                   <ReceiptPreview 
                     order={{
                       id: 'preview',
-                      orderNumber: (useOrdersStore.getState().lastOrderNumber + 1).toString(),
+                      orderNumber: orderNumberRef.current || '', // ✅ BUG FIX
                       items: items.map(item => ({
                         productId: item.product.id,
                         productName: item.product.name,

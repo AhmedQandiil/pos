@@ -9,7 +9,7 @@ import OrderSummary from './OrderSummary';
 import TableSelector from './TableSelector';
 import PaymentModal from './PaymentModal';
 import ReceiptModal from './ReceiptModal';
-import KitchenConfirmModal from './KitchenConfirmModal';
+// ✅ REMOVED: KitchenConfirmModal import
 import { usePaymentStore } from '../../store/paymentStore'; // ✅ NEW
 import { Trash2, Send, CreditCard, X, ShoppingCart as ShoppingCartIcon } from 'lucide-react';
 import { toast } from 'react-hot-toast';
@@ -30,42 +30,11 @@ export default function OrderCart({ onClose }: OrderCartProps) {
   const { addOrder } = useOrdersStore();
   const { openPayment } = usePaymentStore(); // ✅ NEW
   
-  const [showKitchenConfirm, setShowKitchenConfirm] = useState(false);
+  // ✅ REMOVED: showKitchenConfirm state
   const [lastOrder, setLastOrder] = useState<Order | null>(null);
   const [showReceipt, setShowReceipt] = useState(false);
 
-  const handleSendToKitchen = () => {
-    if (items.length === 0) return;
-    
-    const newOrder: Order = {
-      id: generateId(),
-      orderNumber: `ORD-${Math.floor(Math.random() * 9000) + 1000}`,
-      tableNumber: tableNumber || undefined,
-      orderType,
-      deliveryFees,
-      cashierId: currentUser?.id || '',
-      cashierName: currentUser?.name || '',
-      items: items.map(item => ({
-        productId: item.product.id,
-        productName: item.product.name,
-        quantity: item.quantity,
-        unitPrice: item.product.price,
-        total: item.product.price * item.quantity
-      })),
-      subtotal,
-      discount,
-      discountType,
-      total,
-      paymentMethod: 'cash', // Default to cash for now
-      status: 'preparing',
-      notes,
-      createdAt: new Date(),
-    };
-
-    addOrder(newOrder);
-    clearCart();
-    toast.success('تم إرسال الطلب للمطبخ');
-  };
+  // ✅ REMOVED: handleSendToKitchen function
 
   return (
     <div className="flex flex-col h-full bg-[#1a1d26] md:bg-transparent overflow-hidden">
@@ -127,22 +96,15 @@ export default function OrderCart({ onClose }: OrderCartProps) {
 
         <OrderSummary />
 
-        <div className="grid grid-cols-2 gap-4">
-          <button
-            onClick={() => setShowKitchenConfirm(true)}
-            disabled={items.length === 0}
-            className="flex flex-col items-center justify-center gap-1 bg-white/5 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed py-4 rounded-2xl font-black transition-all border border-white/10 touch-feedback group"
-          >
-            <Send className="w-6 h-6 text-slate-400 group-hover:text-white transition-colors" />
-            <span className="text-xs md:text-sm">للمطبخ</span>
-          </button>
+        <div className="flex flex-col gap-4"> {/* ✅ UPDATED: Changed grid to flex-col */}
+          {/* ✅ REMOVED: "للمطبخ" button JSX block */}
           <button
             onClick={() => {
               openPayment();
               if (onClose) onClose();
             }} // ✅ NEW: Use store action and close drawer
             disabled={items.length === 0}
-            className="flex flex-col items-center justify-center gap-1 bg-[#f59e0b] hover:bg-[#fbbf24] disabled:opacity-50 disabled:cursor-not-allowed py-4 rounded-2xl font-black text-black transition-all shadow-xl shadow-[#f59e0b]/20 touch-feedback"
+            className="w-full flex flex-col items-center justify-center gap-1 bg-[#f59e0b] hover:bg-[#fbbf24] disabled:opacity-50 disabled:cursor-not-allowed py-4 rounded-2xl font-black text-black transition-all shadow-xl shadow-[#f59e0b]/20 touch-feedback" // ✅ UPDATED: Added w-full
           >
             <CreditCard className="w-6 h-6" />
             <span className="text-xs md:text-sm">إتمام الطلب</span>
@@ -150,28 +112,7 @@ export default function OrderCart({ onClose }: OrderCartProps) {
         </div>
       </div>
 
-      <AnimatePresence>
-        {showKitchenConfirm && (
-          <KitchenConfirmModal 
-            items={items.map(item => ({
-              productId: item.product.id,
-              productName: item.product.name,
-              quantity: item.quantity,
-              unitPrice: item.product.price,
-              total: item.product.price * item.quantity
-            }))}
-            subtotal={subtotal}
-            discount={discount}
-            deliveryFees={deliveryFees}
-            total={total}
-            onClose={() => setShowKitchenConfirm(false)}
-            onConfirm={() => {
-              handleSendToKitchen();
-              setShowKitchenConfirm(false);
-            }}
-          />
-        )}
-      </AnimatePresence>
+      {/* ✅ REMOVED: AnimatePresence block wrapping KitchenConfirmModal */}
 
       <AnimatePresence>
         {showReceipt && lastOrder && (

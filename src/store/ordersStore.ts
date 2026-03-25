@@ -12,7 +12,7 @@ interface OrdersState {
    * Adds a new order and generates a unique order number
    * @param order Order data (without orderNumber)
    */
-  addOrder: (order: Omit<Order, 'orderNumber'>) => void;
+  addOrder: (order: Omit<Order, 'orderNumber'> & { orderNumber?: string }) => Order; // ✅ BUG FIX
   
   /**
    * Updates the status of an order with transition validation
@@ -61,21 +61,24 @@ export const useOrdersStore = create<OrdersState>((set, get) => ({
   lastOrderNumber: storage.get<number>('pos_last_order_number', MOCK_ORDERS.length),
 
   addOrder: (orderData) => {
-    // ✅ LOGIC FIX: Generates unique orderNumber (format: #0001, #0002...)
+    // ✅ BUG FIX: Respect provided orderNumber or generate new one
     const nextNumber = get().lastOrderNumber + 1;
-    const orderNumber = nextNumber.toString(); // Formatter will handle the #0001 display
+    const orderNumber = orderData.orderNumber || nextNumber.toString();
+    const newLastNumber = orderData.orderNumber ? Math.max(get().lastOrderNumber, parseInt(orderNumber)) : nextNumber;
     
     const newOrder: Order = {
       ...orderData,
       orderNumber,
-    };
+    } as Order;
 
     set((state) => {
       const newOrders = [newOrder, ...state.orders];
       storage.set('pos_orders', newOrders);
-      storage.set('pos_last_order_number', nextNumber); // ✅ LOGIC FIX: Persists and increments
-      return { orders: newOrders, lastOrderNumber: nextNumber };
+      storage.set('pos_last_order_number', newLastNumber);
+      return { orders: newOrders, lastOrderNumber: newLastNumber };
     });
+
+    return newOrder;
   },
 
   updateOrderStatus: (orderId, status) => {
