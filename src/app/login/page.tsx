@@ -19,6 +19,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (currentUser) {
       if (currentUser.role === 'cashier') navigate('/cashier');
+      else if (currentUser.role === 'kitchen') navigate('/kitchen');
       else navigate('/dashboard');
     }
   }, [currentUser, navigate]);

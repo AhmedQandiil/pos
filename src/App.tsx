@@ -4,6 +4,7 @@
  */
 
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuthStore } from './store/authStore';
 import Layout from './components/shared/Layout';
 import AuthWrapper from './components/shared/AuthWrapper';
 import LoginPage from './app/login/page';
@@ -16,6 +17,23 @@ import KitchenPage from './app/kitchen/page';
 import UsersPage from './app/users/page';
 import SettingsPage from './app/settings/page';
 
+function RootRedirect() {
+  const { currentUser } = useAuthStore();
+  if (!currentUser) return <Navigate to="/login" replace />;
+  if (currentUser.role === 'kitchen') return <Navigate to="/kitchen" replace />;
+  if (currentUser.role === 'cashier') return <Navigate to="/cashier" replace />;
+  return <Navigate to="/dashboard" replace />;
+}
+
+function RoleGuard({ children, roles }: { children: React.ReactNode, roles: string[] }) {
+  const { currentUser } = useAuthStore();
+  if (!currentUser) return <Navigate to="/login" replace />;
+  if (!roles.includes(currentUser.role)) {
+    return <RootRedirect />;
+  }
+  return <>{children}</>;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -25,15 +43,47 @@ export default function App() {
           <AuthWrapper>
             <Layout>
               <Routes>
-                <Route path="/" element={<Navigate to="/cashier" replace />} />
-                <Route path="/cashier" element={<CashierPage />} />
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/products" element={<ProductsPage />} />
-                <Route path="/expenses" element={<ExpensesPage />} />
-                <Route path="/orders" element={<OrdersPage />} />
-                <Route path="/kitchen" element={<KitchenPage />} />
-                <Route path="/users" element={<UsersPage />} />
-                <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/" element={<RootRedirect />} />
+                <Route path="/cashier" element={
+                  <RoleGuard roles={['admin', 'manager', 'cashier']}>
+                    <CashierPage />
+                  </RoleGuard>
+                } />
+                <Route path="/dashboard" element={
+                  <RoleGuard roles={['admin', 'manager']}>
+                    <DashboardPage />
+                  </RoleGuard>
+                } />
+                <Route path="/products" element={
+                  <RoleGuard roles={['admin', 'manager']}>
+                    <ProductsPage />
+                  </RoleGuard>
+                } />
+                <Route path="/expenses" element={
+                  <RoleGuard roles={['admin', 'manager']}>
+                    <ExpensesPage />
+                  </RoleGuard>
+                } />
+                <Route path="/orders" element={
+                  <RoleGuard roles={['admin', 'manager', 'cashier']}>
+                    <OrdersPage />
+                  </RoleGuard>
+                } />
+                <Route path="/kitchen" element={
+                  <RoleGuard roles={['admin', 'manager', 'cashier', 'kitchen']}>
+                    <KitchenPage />
+                  </RoleGuard>
+                } />
+                <Route path="/users" element={
+                  <RoleGuard roles={['admin']}>
+                    <UsersPage />
+                  </RoleGuard>
+                } />
+                <Route path="/settings" element={
+                  <RoleGuard roles={['admin']}>
+                    <SettingsPage />
+                  </RoleGuard>
+                } />
               </Routes>
             </Layout>
           </AuthWrapper>

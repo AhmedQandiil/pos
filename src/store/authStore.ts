@@ -12,6 +12,7 @@ const PERMISSIONS = {
   editPrices: ['admin', 'manager'],
   viewDashboard: ['admin', 'manager'],
   viewOwnOrders: ['cashier', 'admin', 'manager'],
+  viewKitchen: ['kitchen', 'admin', 'manager', 'cashier'], // Kitchen role definitely needs this, others can too
 } as const;
 
 type Action = keyof typeof PERMISSIONS;

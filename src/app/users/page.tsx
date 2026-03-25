@@ -75,6 +75,7 @@ export default function UsersPage() {
                     <span className={`px-3 py-1 rounded-lg text-xs font-bold ${
                       user.role === 'admin' ? 'bg-purple-500/10 text-purple-500' :
                       user.role === 'manager' ? 'bg-blue-500/10 text-blue-500' :
+                      user.role === 'kitchen' ? 'bg-amber-500/10 text-amber-500' :
                       'bg-slate-500/10 text-slate-400'
                     }`}>
                       {USER_ROLE_LABELS[user.role]}
@@ -131,6 +132,7 @@ export default function UsersPage() {
               <span className={`px-4 py-1.5 rounded-xl text-sm font-black ${
                 user.role === 'admin' ? 'bg-purple-500/10 text-purple-500' :
                 user.role === 'manager' ? 'bg-blue-500/10 text-blue-500' :
+                user.role === 'kitchen' ? 'bg-amber-500/10 text-amber-500' :
                 'bg-slate-500/10 text-slate-400'
               }`}>
                 {USER_ROLE_LABELS[user.role]}

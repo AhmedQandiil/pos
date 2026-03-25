@@ -5,7 +5,7 @@ import { useOrdersStore } from '../../store/ordersStore';
 import { useAuthStore } from '../../store/authStore';
 import { formatCurrency, formatDateTime } from '../../lib/formatters';
 import { ORDER_STATUS_LABELS, PAYMENT_METHOD_LABELS } from '../../lib/constants';
-import { Search, Filter, Eye, Printer, XCircle, Calendar } from 'lucide-react';
+import { Search, Filter, Eye, Printer, XCircle, Calendar, Users } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import ReceiptModal from '../../components/cashier/ReceiptModal';
 import { Order } from '../../types';
@@ -17,6 +17,7 @@ export default function OrdersPage() {
   const { currentUser } = useAuthStore();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [selectedCashierId, setSelectedCashierId] = useState<string | null>(null); // ✅ NEW
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showFilters, setShowFilters] = useState(false); // ✅ RESPONSIVE FIX
   const [dateRange, setDateRange] = useState<{ start: Date; end: Date }>({
@@ -24,15 +25,31 @@ export default function OrdersPage() {
     end: endOfDay(new Date()),
   });
 
+  // ✅ NEW: Filter orders based on role
+  const visibleOrders = useMemo(() => {
+    if (currentUser?.role === 'cashier') {
+      return orders.filter(o => o.cashierId === currentUser.id);
+    }
+    return orders; // admin + manager see all
+  }, [orders, currentUser]);
+
+  // ✅ NEW: Get unique cashiers from ALL orders
+  const cashierList = useMemo(() => {
+    const map = new Map<string, string>();
+    orders.forEach(o => map.set(o.cashierId, o.cashierName));
+    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
+  }, [orders]);
+
   const filteredOrders = useMemo(() => {
-    return orders.filter((o) => {
+    return visibleOrders.filter((o) => { // ✅ UPDATED: Use visibleOrders
       const matchesSearch = o.orderNumber.toLowerCase().includes(search.toLowerCase()) || 
                            o.tableNumber?.toString() === search;
       const matchesStatus = statusFilter === 'all' ? true : o.status === statusFilter;
       const matchesDate = isWithinInterval(new Date(o.createdAt), { start: dateRange.start, end: dateRange.end });
-      return matchesSearch && matchesStatus && matchesDate;
+      const matchesCashier = !selectedCashierId ? true : o.cashierId === selectedCashierId; // ✅ NEW
+      return matchesSearch && matchesStatus && matchesDate && matchesCashier;
     });
-  }, [orders, search, statusFilter, dateRange]);
+  }, [visibleOrders, search, statusFilter, dateRange, selectedCashierId]); // ✅ UPDATED: Dependencies
 
   const handleCancelOrder = (id: string) => {
     if (currentUser?.role !== 'admin' && currentUser?.role !== 'manager') { // ✅ BUG FIX
@@ -87,6 +104,28 @@ export default function OrdersPage() {
             ))}
           </select>
         </div>
+
+        {/* ✅ NEW: Cashier Filter Dropdown (Admin/Manager only) */}
+        {currentUser?.role !== 'cashier' && (
+          <div className="flex items-center gap-2 bg-[#1a1d26] border border-white/5 p-1 rounded-xl relative">
+            <div className="px-4 text-slate-400">
+              <Users className="w-4 h-4" />
+            </div>
+            <select
+              value={selectedCashierId || ''}
+              onChange={(e) => setSelectedCashierId(e.target.value || null)}
+              className="bg-transparent border-none focus:ring-0 text-base md:text-sm font-bold pr-8 min-h-[48px] md:min-h-0 w-full md:w-auto"
+            >
+              <option value="">كل الكاشيرات</option>
+              {cashierList.map((cashier) => (
+                <option key={cashier.id} value={cashier.id}>{cashier.name}</option>
+              ))}
+            </select>
+            {selectedCashierId && (
+              <div className="absolute -top-2 -right-2 w-4 h-4 bg-[#f59e0b] rounded-full border-2 border-[#1a1d26]" />
+            )}
+          </div>
+        )}
       </div>
 
       {/* Desktop Table View */}

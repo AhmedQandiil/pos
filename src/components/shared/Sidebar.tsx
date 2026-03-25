@@ -24,7 +24,7 @@ import { cn } from '../../lib/utils';
 const menuItems = [
   { name: 'الكاشير', icon: ShoppingCart, path: '/cashier', roles: ['admin', 'manager', 'cashier'] },
   { name: 'لوحة التحكم', icon: LayoutDashboard, path: '/dashboard', roles: ['admin', 'manager'] },
-  { name: 'المطبخ', icon: ChefHat, path: '/kitchen', roles: ['admin', 'manager', 'cashier'] },
+  { name: 'المطبخ', icon: ChefHat, path: '/kitchen', roles: ['admin', 'manager', 'cashier', 'kitchen'] },
   { name: 'المنتجات', icon: Package, path: '/products', roles: ['admin', 'manager'] },
   { name: 'المصاريف', icon: Wallet, path: '/expenses', roles: ['admin', 'manager'] },
   { name: 'سجل الطلبات', icon: Receipt, path: '/orders', roles: ['admin', 'manager', 'cashier'] },
@@ -33,11 +33,11 @@ const menuItems = [
 ];
 
 const mobileMenuItems = [
-  { name: 'كاشير', icon: ShoppingCart, path: '/cashier' },
-  { name: 'داش بورد', icon: LayoutDashboard, path: '/dashboard' },
-  { name: 'منتجات', icon: Package, path: '/products' },
-  { name: 'مصاريف', icon: Wallet, path: '/expenses' },
-  { name: 'المزيد', icon: MoreHorizontal, path: '/settings' },
+  { name: 'كاشير', icon: ShoppingCart, path: '/cashier', roles: ['admin', 'manager', 'cashier'] },
+  { name: 'داش بورد', icon: LayoutDashboard, path: '/dashboard', roles: ['admin', 'manager'] },
+  { name: 'مطبخ', icon: ChefHat, path: '/kitchen', roles: ['admin', 'manager', 'cashier', 'kitchen'] },
+  { name: 'منتجات', icon: Package, path: '/products', roles: ['admin', 'manager'] },
+  { name: 'المزيد', icon: MoreHorizontal, path: '/settings', roles: ['admin'] },
 ];
 
 export default function Sidebar() {
@@ -51,27 +51,35 @@ export default function Sidebar() {
   );
 
   // ✅ RESPONSIVE FIX: Bottom Navigation for Mobile
-  const BottomNav = () => (
-    <nav className="fixed bottom-0 left-0 right-0 bg-[#1a1d26] border-t border-white/5 flex items-center justify-around px-2 py-3 safe-bottom md:hidden z-50">
-      {mobileMenuItems.map((item) => {
-        const Icon = item.icon;
-        const isActive = pathname === item.path;
-        return (
-          <Link
-            key={item.path}
-            to={item.path}
-            className={cn(
-              "flex flex-col items-center gap-1 transition-all touch-feedback",
-              isActive ? "text-[#f59e0b]" : "text-slate-400"
-            )}
-          >
-            <Icon className="w-6 h-6" />
-            <span className="text-[10px] font-bold">{item.name}</span>
-          </Link>
-        );
-      })}
-    </nav>
-  );
+  const BottomNav = () => {
+    const filteredMobileMenu = mobileMenuItems.filter(item => 
+      currentUser && item.roles.includes(currentUser.role)
+    );
+
+    if (filteredMobileMenu.length === 0) return null;
+
+    return (
+      <nav className="fixed bottom-0 left-0 right-0 bg-[#1a1d26] border-t border-white/5 flex items-center justify-around px-2 py-3 safe-bottom md:hidden z-50">
+        {filteredMobileMenu.map((item) => {
+          const Icon = item.icon;
+          const isActive = pathname === item.path;
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={cn(
+                "flex flex-col items-center gap-1 transition-all touch-feedback",
+                isActive ? "text-[#f59e0b]" : "text-slate-400"
+              )}
+            >
+              <Icon className="w-6 h-6" />
+              <span className="text-[10px] font-bold">{item.name}</span>
+            </Link>
+          );
+        })}
+      </nav>
+    );
+  };
 
   return (
     <>

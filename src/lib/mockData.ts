@@ -51,6 +51,7 @@ export const MOCK_USERS: User[] = [
   { id: 'u2', name: 'سارة (المديرة)', pin: '1111', role: 'manager', isActive: true },
   { id: 'u3', name: 'محمد (كاشير)', pin: '2222', role: 'cashier', isActive: true },
   { id: 'u4', name: 'ليلى (كاشير)', pin: '3333', role: 'cashier', isActive: true },
+  { id: 'u5', name: 'الشيف (المطبخ)', pin: '4444', role: 'kitchen', isActive: true },
 ];
 
 /**

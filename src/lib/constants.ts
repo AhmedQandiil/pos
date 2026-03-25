@@ -36,4 +36,5 @@ export const USER_ROLE_LABELS: Record<string, string> = {
   admin: 'مدير نظام',
   manager: 'مدير فرع',
   cashier: 'كاشير',
+  kitchen: 'مطبخ',
 };

@@ -54,6 +54,13 @@ interface OrdersState {
    * @param limit Number of products to return
    */
   getTopProducts: (startDate: Date, endDate: Date, limit?: number) => { productId: string; name: string; quantity: number; total: number }[];
+  
+  /**
+   * Returns sales performance by cashier
+   * @param startDate Optional start date
+   * @param endDate Optional end date
+   */
+  getSalesByCashier: (startDate?: Date, endDate?: Date) => { cashierId: string; cashierName: string; ordersCount: number; totalSales: number }[]; // ✅ NEW
 }
 
 export const useOrdersStore = create<OrdersState>((set, get) => ({
@@ -170,5 +177,34 @@ export const useOrdersStore = create<OrdersState>((set, get) => ({
     return Object.values(productStats)
       .sort((a, b) => b.quantity - a.quantity)
       .slice(0, limit);
+  },
+
+  getSalesByCashier: (startDate, endDate) => { // ✅ NEW
+    let filteredOrders = get().orders.filter(o => o.status === 'completed');
+    
+    if (startDate && endDate) {
+      const interval = { start: startOfDay(startDate), end: endOfDay(endDate) };
+      filteredOrders = filteredOrders.filter(order => {
+        const orderDate = new Date(order.createdAt);
+        return isWithinInterval(orderDate, interval);
+      });
+    }
+
+    const stats: Record<string, { cashierId: string; cashierName: string; ordersCount: number; totalSales: number }> = {};
+
+    filteredOrders.forEach(order => {
+      if (!stats[order.cashierId]) {
+        stats[order.cashierId] = {
+          cashierId: order.cashierId,
+          cashierName: order.cashierName,
+          ordersCount: 0,
+          totalSales: 0
+        };
+      }
+      stats[order.cashierId].ordersCount += 1;
+      stats[order.cashierId].totalSales += order.total;
+    });
+
+    return Object.values(stats).sort((a, b) => b.totalSales - a.totalSales);
   }
 }));

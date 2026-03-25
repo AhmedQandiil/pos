@@ -80,7 +80,7 @@ export interface Expense {
   createdBy: string;
 }
 
-export type UserRole = 'admin' | 'manager' | 'cashier';
+export type UserRole = 'admin' | 'manager' | 'cashier' | 'kitchen';
 
 export interface User {
   id: string;
