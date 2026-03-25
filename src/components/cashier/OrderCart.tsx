@@ -9,10 +9,13 @@ import OrderSummary from './OrderSummary';
 import TableSelector from './TableSelector';
 import PaymentModal from './PaymentModal';
 import ReceiptModal from './ReceiptModal';
-import { Trash2, Send, CreditCard, X } from 'lucide-react';
+import KitchenConfirmModal from './KitchenConfirmModal';
+import { usePaymentStore } from '../../store/paymentStore'; // ✅ NEW
+import { Trash2, Send, CreditCard, X, ShoppingCart as ShoppingCartIcon } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { Order } from '../../types';
 import { generateId } from '../../lib/utils';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface OrderCartProps {
   onClose?: () => void;
@@ -25,8 +28,9 @@ export default function OrderCart({ onClose }: OrderCartProps) {
   } = useCartStore();
   const { currentUser } = useAuthStore();
   const { addOrder } = useOrdersStore();
+  const { openPayment } = usePaymentStore(); // ✅ NEW
   
-  const [showPayment, setShowPayment] = useState(false);
+  const [showKitchenConfirm, setShowKitchenConfirm] = useState(false);
   const [lastOrder, setLastOrder] = useState<Order | null>(null);
   const [showReceipt, setShowReceipt] = useState(false);
 
@@ -63,44 +67,8 @@ export default function OrderCart({ onClose }: OrderCartProps) {
     toast.success('تم إرسال الطلب للمطبخ');
   };
 
-  const handleCompletePayment = (paymentMethod: Order['paymentMethod'], amountPaid?: number) => {
-    const newOrder: Order = {
-      id: generateId(),
-      orderNumber: `ORD-${Math.floor(Math.random() * 9000) + 1000}`,
-      tableNumber: tableNumber || undefined,
-      orderType,
-      deliveryFees,
-      cashierId: currentUser?.id || '',
-      cashierName: currentUser?.name || '',
-      items: items.map(item => ({
-        productId: item.product.id,
-        productName: item.product.name,
-        quantity: item.quantity,
-        unitPrice: item.product.price,
-        total: item.product.price * item.quantity
-      })),
-      subtotal,
-      discount,
-      discountType,
-      total,
-      paymentMethod,
-      amountPaid,
-      change: amountPaid ? Math.max(0, amountPaid - total) : 0,
-      status: 'preparing',
-      notes,
-      createdAt: new Date(),
-    };
-
-    addOrder(newOrder);
-    setLastOrder(newOrder);
-    setShowPayment(false);
-    setShowReceipt(true);
-    clearCart();
-    toast.success('تم إتمام الطلب بنجاح');
-  };
-
   return (
-    <div className="flex flex-col h-full bg-[#1a1d26] lg:bg-transparent overflow-hidden">
+    <div className="flex flex-col h-full bg-[#1a1d26] md:bg-transparent overflow-hidden">
       {/* Header */}
       <div className="p-4 md:p-6 border-b border-white/5 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
@@ -126,7 +94,7 @@ export default function OrderCart({ onClose }: OrderCartProps) {
           {onClose && (
             <button
               onClick={onClose}
-              className="p-2 text-slate-400 hover:bg-white/5 rounded-xl transition-colors lg:hidden touch-feedback"
+              className="p-2 text-slate-400 hover:bg-white/5 rounded-xl transition-colors md:hidden touch-feedback"
             >
               <X className="w-6 h-6" />
             </button>
@@ -149,7 +117,7 @@ export default function OrderCart({ onClose }: OrderCartProps) {
       </div>
 
       {/* Summary & Actions */}
-      <div className="p-4 md:p-6 bg-black/40 lg:bg-transparent border-t border-white/5 space-y-4 shrink-0 pb-10 lg:pb-6">
+      <div className="p-4 md:p-6 bg-black/40 md:bg-transparent border-t border-white/5 space-y-4 shrink-0 pb-10 lg:pb-6">
         <textarea
           placeholder="ملاحظات الطلب..."
           value={notes}
@@ -161,7 +129,7 @@ export default function OrderCart({ onClose }: OrderCartProps) {
 
         <div className="grid grid-cols-2 gap-4">
           <button
-            onClick={handleSendToKitchen}
+            onClick={() => setShowKitchenConfirm(true)}
             disabled={items.length === 0}
             className="flex flex-col items-center justify-center gap-1 bg-white/5 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed py-4 rounded-2xl font-black transition-all border border-white/10 touch-feedback group"
           >
@@ -169,49 +137,51 @@ export default function OrderCart({ onClose }: OrderCartProps) {
             <span className="text-xs md:text-sm">للمطبخ</span>
           </button>
           <button
-            onClick={() => setShowPayment(true)}
+            onClick={() => {
+              openPayment();
+              if (onClose) onClose();
+            }} // ✅ NEW: Use store action and close drawer
             disabled={items.length === 0}
             className="flex flex-col items-center justify-center gap-1 bg-[#f59e0b] hover:bg-[#fbbf24] disabled:opacity-50 disabled:cursor-not-allowed py-4 rounded-2xl font-black text-black transition-all shadow-xl shadow-[#f59e0b]/20 touch-feedback"
           >
             <CreditCard className="w-6 h-6" />
-            <span className="text-xs md:text-sm">إتمام الدفع</span>
+            <span className="text-xs md:text-sm">إتمام الطلب</span>
           </button>
         </div>
       </div>
 
-      {showPayment && (
-        <PaymentModal 
-          total={total} 
-          onClose={() => setShowPayment(false)} 
-          onConfirm={handleCompletePayment} 
-        />
-      )}
+      <AnimatePresence>
+        {showKitchenConfirm && (
+          <KitchenConfirmModal 
+            items={items.map(item => ({
+              productId: item.product.id,
+              productName: item.product.name,
+              quantity: item.quantity,
+              unitPrice: item.product.price,
+              total: item.product.price * item.quantity
+            }))}
+            subtotal={subtotal}
+            discount={discount}
+            deliveryFees={deliveryFees}
+            total={total}
+            onClose={() => setShowKitchenConfirm(false)}
+            onConfirm={() => {
+              handleSendToKitchen();
+              setShowKitchenConfirm(false);
+            }}
+          />
+        )}
+      </AnimatePresence>
 
-      {showReceipt && lastOrder && (
-        <ReceiptModal 
-          order={lastOrder} 
-          onClose={() => setShowReceipt(false)} 
-        />
-      )}
+      <AnimatePresence>
+        {showReceipt && lastOrder && (
+          <ReceiptModal 
+            order={lastOrder} 
+            onClose={() => setShowReceipt(false)} 
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
-function ShoppingCartIcon({ className }: { className?: string }) {
-  return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      width="24" 
-      height="24" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      className={className}
-    >
-      <circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
-    </svg>
-  );
-}

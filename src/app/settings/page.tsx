@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useAuthStore } from '../../store/authStore';
-import { Save, Building2, Phone, MapPin, Truck, Coins, Percent } from 'lucide-react';
+import { Save, Building2, Phone, MapPin, Truck, Coins, Percent, Printer } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { Navigate } from 'react-router-dom';
 
@@ -127,6 +127,40 @@ export default function SettingsPage() {
                   className="w-full bg-[#0f1117] border border-white/5 rounded-xl py-3 px-4 pl-12 focus:outline-none focus:border-[#f59e0b]/50 transition-all font-space-mono"
                 />
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Receipt Settings */}
+        <div className="bg-[#1a1d26] border border-white/5 rounded-2xl p-6 space-y-6 md:col-span-2">
+          <div className="flex items-center gap-3 text-[#f59e0b] mb-2">
+            <Printer className="w-5 h-5" />
+            <h2 className="text-xl font-bold">إعدادات الفاتورة</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-bold text-slate-400 mb-2">نص تذييل الفاتورة الافتراضي</label>
+              <textarea
+                value={formData.receiptFooter}
+                onChange={(e) => setFormData({ ...formData, receiptFooter: e.target.value })}
+                className="w-full bg-[#0f1117] border border-white/5 rounded-xl py-3 px-4 focus:outline-none focus:border-[#f59e0b]/50 transition-all resize-none h-24"
+                placeholder="شكراً لزيارتكم! نتمنى رؤيتكم قريباً."
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-slate-400 mb-2">محتوى QR Code الافتراضي</label>
+              <input
+                type="text"
+                value={formData.qrCodeContent}
+                onChange={(e) => setFormData({ ...formData, qrCodeContent: e.target.value })}
+                className="w-full bg-[#0f1117] border border-white/5 rounded-xl py-3 px-4 focus:outline-none focus:border-[#f59e0b]/50 transition-all"
+                placeholder="رابط موقع المطعم أو صفحة الفيسبوك"
+              />
+              <p className="mt-2 text-xs text-slate-500">
+                سيتم إنشاء كود QR تلقائياً بهذا المحتوى في نهاية كل فاتورة.
+              </p>
             </div>
           </div>
         </div>

@@ -16,13 +16,13 @@ interface DateRangePickerProps {
 
 export default function DateRangePicker({ value, onChange }: DateRangePickerProps) {
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-3 bg-[#1a1d26] border border-white/5 p-2 rounded-xl">
-      <div className="flex items-center gap-2 px-2 text-slate-400 border-l border-white/5 ml-2">
+    <div className="flex flex-col md:flex-row items-center gap-2 bg-[#1a1d26] border border-white/5 p-1.5 rounded-xl w-full md:w-auto overflow-hidden">
+      <div className="flex items-center gap-2 px-2 text-slate-400 border-l border-white/5 ml-1 shrink-0">
         <Calendar className="w-4 h-4" />
-        <span className="text-sm font-bold whitespace-nowrap">الفترة:</span>
+        <span className="text-xs font-bold whitespace-nowrap hidden lg:inline">الفترة:</span>
       </div>
       
-      <div className="flex flex-wrap gap-1">
+      <div className="flex flex-wrap justify-center gap-1 shrink-0">
         {[
           { label: 'اليوم', days: 0 },
           { label: 'أسبوع', days: 7 },
@@ -42,28 +42,28 @@ export default function DateRangePicker({ value, onChange }: DateRangePickerProp
         ))}
       </div>
 
-      <div className="h-4 w-px bg-white/5 hidden sm:block mx-2" />
+      <div className="h-4 w-px bg-white/5 hidden md:block mx-1 shrink-0" />
 
-      <div className="flex items-center gap-2">
-        <div className="flex items-center gap-2 bg-[#0f1117] border border-white/10 rounded-lg px-2 py-1">
-          <span className="text-[10px] text-slate-500 font-bold">من:</span>
+      <div className="flex flex-wrap justify-center items-center gap-1 shrink-0">
+        <div className="flex items-center gap-1.5 bg-[#0f1117] border border-white/10 rounded-lg px-2 py-1">
+          <span className="text-[9px] text-slate-500 font-bold">من:</span>
           <DatePicker
             selected={value.start}
             onChange={(date) => date && onChange({ ...value, start: startOfDay(date) })}
             dateFormat="yyyy-MM-dd"
             locale="ar"
-            className="bg-transparent border-none focus:ring-0 text-xs font-bold text-white p-0 w-24 cursor-pointer"
+            className="bg-transparent border-none focus:ring-0 text-[11px] font-bold text-white p-0 w-20 cursor-pointer"
             popperPlacement="bottom-end"
           />
         </div>
-        <div className="flex items-center gap-2 bg-[#0f1117] border border-white/10 rounded-lg px-2 py-1">
-          <span className="text-[10px] text-slate-500 font-bold">إلى:</span>
+        <div className="flex items-center gap-1.5 bg-[#0f1117] border border-white/10 rounded-lg px-2 py-1">
+          <span className="text-[9px] text-slate-500 font-bold">إلى:</span>
           <DatePicker
             selected={value.end}
             onChange={(date) => date && onChange({ ...value, end: endOfDay(date) })}
             dateFormat="yyyy-MM-dd"
             locale="ar"
-            className="bg-transparent border-none focus:ring-0 text-xs font-bold text-white p-0 w-24 cursor-pointer"
+            className="bg-transparent border-none focus:ring-0 text-[11px] font-bold text-white p-0 w-20 cursor-pointer"
             popperPlacement="bottom-end"
           />
         </div>

@@ -38,19 +38,19 @@ export default function ProductsPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4"> {/* ✅ RESPONSIVE FIX */}
-        <h1 className="text-2xl md:text-3xl font-bold">إدارة المنتجات</h1> {/* ✅ RESPONSIVE FIX */}
-        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto"> {/* ✅ RESPONSIVE FIX */}
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+        <h1 className="text-2xl md:text-3xl font-bold">إدارة المنتجات</h1>
+        <div className="flex flex-col md:flex-row gap-3 w-full xl:w-auto">
           <button
             onClick={() => setIsCategoryModalOpen(true)}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white font-bold py-3 px-6 rounded-xl transition-all border border-white/5 min-h-[48px]" // ✅ RESPONSIVE FIX
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white font-bold py-3 px-6 rounded-xl transition-all border border-white/5 min-h-[48px] whitespace-nowrap"
           >
             <FolderPlus className="w-5 h-5" />
             <span>إضافة تصنيف</span>
           </button>
           <button
             onClick={handleAdd}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#f59e0b] hover:bg-[#d97706] text-black font-bold py-3 px-6 rounded-xl transition-all min-h-[48px]" // ✅ RESPONSIVE FIX
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-[#f59e0b] hover:bg-[#d97706] text-black font-bold py-3 px-6 rounded-xl transition-all min-h-[48px] whitespace-nowrap"
           >
             <Plus className="w-5 h-5" />
             <span>إضافة منتج جديد</span>
@@ -58,18 +58,18 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4"> {/* ✅ RESPONSIVE FIX */}
-        <div className="relative flex-1 w-full"> {/* ✅ RESPONSIVE FIX */}
+      <div className="flex flex-col lg:flex-row gap-4">
+        <div className="relative flex-1 w-full">
           <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
           <input
             type="text"
             placeholder="ابحث عن منتج..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-[#1a1d26] border border-white/5 rounded-xl py-4 pr-12 pl-4 focus:outline-none focus:border-[#f59e0b]/50 transition-all min-h-[48px] text-lg" // ✅ RESPONSIVE FIX
+            className="w-full bg-[#1a1d26] border border-white/5 rounded-xl py-4 pr-12 pl-4 focus:outline-none focus:border-[#f59e0b]/50 transition-all min-h-[48px] text-lg"
           />
         </div>
-        <div className="w-full md:w-auto"> {/* ✅ RESPONSIVE FIX */}
+        <div className="w-full lg:w-auto min-w-0 overflow-hidden">
           <CategoryFilter 
             categories={categories} 
             selected={selectedCategory} 

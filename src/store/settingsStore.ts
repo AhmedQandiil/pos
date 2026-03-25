@@ -14,6 +14,8 @@ const DEFAULT_SETTINGS: Settings = {
   defaultDeliveryFees: 15,
   currency: 'ج.م',
   taxRate: 0,
+  receiptFooter: 'شكراً لزيارتكم! نتمنى رؤيتكم قريباً.',
+  qrCodeContent: 'https://albaraka-restaurant.com',
 };
 
 export const useSettingsStore = create<SettingsState>((set) => ({

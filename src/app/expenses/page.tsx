@@ -42,15 +42,15 @@ export default function ExpensesPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         <h1 className="text-2xl md:text-3xl font-bold">إدارة المصاريف</h1>
-        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-          <div className="flex-1 sm:flex-none">
+        <div className="flex flex-col md:flex-row gap-3 w-full xl:w-auto">
+          <div className="flex-1 md:flex-none">
             <DateRangePicker value={dateRange} onChange={setDateRange} />
           </div>
           <button
             onClick={() => setIsFormOpen(true)}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 px-6 rounded-xl transition-all min-h-[48px]"
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 px-6 rounded-xl transition-all min-h-[48px] whitespace-nowrap"
           >
             <Plus className="w-5 h-5" />
             <span>إضافة مصروف جديد</span>

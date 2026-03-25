@@ -91,23 +91,30 @@ export default function Sidebar() {
         className={cn(
           "fixed top-0 right-0 bottom-0 bg-[#1a1d26] border-l border-white/5 flex flex-col h-full shrink-0 transition-all duration-300 z-50", // ✅ RTL FIX: right-0, border-l
           isSidebarCollapsed ? "w-16" : "w-[220px]", // ✅ RESPONSIVE FIX: 64px vs 220px
-          "hidden md:flex", // ✅ RESPONSIVE FIX: Hidden on mobile
-          !isSidebarOpen && "translate-x-full lg:translate-x-0" // ✅ RESPONSIVE FIX: Slide-in for tablet
+          !isSidebarOpen ? "translate-x-full lg:translate-x-0" : "translate-x-0" // ✅ RESPONSIVE FIX: Slide-in for mobile/tablet
         )}
       >
         {/* Header */}
-        <div className="p-4 border-b border-white/5 flex items-center justify-between overflow-hidden">
-          <div className={cn("flex items-center gap-3 transition-all", isSidebarCollapsed && "opacity-0")}>
-            <div className="w-8 h-8 bg-[#f59e0b] rounded-lg flex items-center justify-center shrink-0">
-              <ChefHat className="text-black w-5 h-5" />
+        <div className={cn(
+          "p-4 border-b border-white/5 flex items-center transition-all",
+          isSidebarCollapsed ? "justify-center" : "justify-between"
+        )}>
+          {!isSidebarCollapsed && (
+            <div className="flex items-center gap-3 transition-all animate-in fade-in slide-in-from-right-2">
+              <div className="w-8 h-8 bg-[#f59e0b] rounded-lg flex items-center justify-center shrink-0">
+                <ChefHat className="text-black w-5 h-5" />
+              </div>
+              <h1 className="font-bold text-sm leading-tight whitespace-nowrap">{APP_NAME}</h1>
             </div>
-            <h1 className="font-bold text-sm leading-tight whitespace-nowrap">{APP_NAME}</h1>
-          </div>
+          )}
           
-          {/* ✅ RESPONSIVE FIX: Toggle Button */}
           <button 
             onClick={toggleSidebarCollapse}
-            className="p-1 hover:bg-white/5 rounded-lg text-slate-400 lg:flex hidden"
+            className={cn(
+              "p-1.5 hover:bg-white/5 rounded-lg text-slate-400 transition-all",
+              isSidebarCollapsed ? "mx-auto" : ""
+            )}
+            title={isSidebarCollapsed ? "توسيع" : "طي"}
           >
             {isSidebarCollapsed ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
           </button>
@@ -124,17 +131,22 @@ export default function Sidebar() {
                 to={item.path}
                 className={cn(
                   "flex items-center gap-3 px-3 py-3 rounded-xl transition-all group relative",
+                  isSidebarCollapsed ? "justify-center" : "justify-start",
                   isActive 
                     ? "bg-[#f59e0b] text-black font-bold" 
                     : "text-slate-400 hover:bg-white/5 hover:text-white"
                 )}
+                title={isSidebarCollapsed ? item.name : ""}
               >
                 <Icon className={cn("w-5 h-5 shrink-0", isActive ? "text-black" : "group-hover:text-[#f59e0b]")} />
-                {!isSidebarCollapsed && <span className="whitespace-nowrap text-sm">{item.name}</span>}
+                {!isSidebarCollapsed && <span className="whitespace-nowrap text-sm animate-in fade-in slide-in-from-right-2">{item.name}</span>}
                 
                 {/* ✅ RTL FIX: Active indicator on RIGHT side */}
                 {isActive && (
-                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-black rounded-l-full" />
+                  <div className={cn(
+                    "absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-black rounded-l-full",
+                    isSidebarCollapsed && "hidden"
+                  )} />
                 )}
               </Link>
             );

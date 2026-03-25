@@ -68,7 +68,7 @@ export default function ProductGrid() {
       {/* Grid */}
       {/* ✅ RESPONSIVE FIX: Grid cols for different breakpoints */}
       <div className="flex-1 overflow-y-auto pr-1 no-scrollbar scroll-touch min-h-0">
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4 pb-20 lg:pb-0">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4 pb-20 md:pb-0">
           {filteredProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

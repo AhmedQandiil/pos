@@ -64,6 +64,8 @@ export interface Settings {
   defaultDeliveryFees: number;
   currency: string;
   taxRate: number;
+  receiptFooter?: string;
+  qrCodeContent?: string;
 }
 
 export type ExpenseCategory = 'rent' | 'salaries' | 'ingredients' | 'maintenance' | 'other';

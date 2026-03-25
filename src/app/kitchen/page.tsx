@@ -7,22 +7,20 @@ import { AnimatePresence } from 'motion/react';
 import { differenceInMinutes } from 'date-fns';
 import OrderTicket from '../../components/kitchen/OrderTicket';
 
+import { toast } from 'react-hot-toast';
+
 export default function KitchenPage() {
   const { orders, updateOrderStatus } = useOrdersStore();
   const [now, setNow] = useState(new Date());
 
+  const handleStatusUpdate = (orderId: string, status: 'ready' | 'completed') => {
+    updateOrderStatus(orderId, status);
+    toast.success(status === 'ready' ? 'تم تجهيز الطلب' : 'تم تسليم الطلب');
+  };
+
   const preparingOrders = useMemo(() => orders.filter(o => o.status === 'preparing'), [orders]);
   
-  const readyOrders = useMemo(() => {
-    return orders.filter(o => {
-      if (o.status === 'ready') return true;
-      if (o.status === 'completed' && o.completedAt) {
-        const diff = differenceInMinutes(now, new Date(o.completedAt));
-        return diff < 2; // ✅ BUG FIX: Completed orders disappear after 2 minutes
-      }
-      return false;
-    });
-  }, [orders, now]);
+  const readyOrders = useMemo(() => orders.filter(o => o.status === 'ready'), [orders]);
 
   // Auto refresh every 30 seconds
   useEffect(() => {
@@ -77,7 +75,7 @@ export default function KitchenPage() {
                   <OrderTicket 
                     key={order.id} 
                     order={order} 
-                    onAction={() => updateOrderStatus(order.id, 'ready')}
+                    onAction={() => handleStatusUpdate(order.id, 'ready')}
                     actionLabel="جاهز"
                     actionColor="bg-emerald-500"
                   />
@@ -110,7 +108,7 @@ export default function KitchenPage() {
                   <OrderTicket 
                     key={order.id} 
                     order={order} 
-                    onAction={() => updateOrderStatus(order.id, 'completed')}
+                    onAction={() => handleStatusUpdate(order.id, 'completed')}
                     actionLabel="تم التسليم"
                     actionColor="bg-blue-600"
                   />

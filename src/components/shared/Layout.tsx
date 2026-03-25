@@ -26,7 +26,7 @@ export default function Layout({
             "flex-1 flex flex-col min-w-0 transition-all duration-300",
             "lg:pr-[220px]", // ✅ RESPONSIVE FIX: Desktop expanded
             isSidebarCollapsed && "lg:pr-16", // ✅ RESPONSIVE FIX: Desktop collapsed
-            "md:pr-0", // ✅ RESPONSIVE FIX: Tablet portrait (sidebar is overlay)
+            "pr-0", // ✅ RESPONSIVE FIX: Mobile/Tablet
             "pb-20 md:pb-0" // ✅ RESPONSIVE FIX: Mobile bottom nav space
           )}
         >
